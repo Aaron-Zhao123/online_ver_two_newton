@@ -69,37 +69,37 @@ always @ (posedge clk or posedge asyn_reset) begin
 		enable_add_one_fifo<= 0;
 	end
 	else begin
-		if (counter > 5 ) begin
+		if (counter > 2 ) begin
 			enable_add_one_fifo <= 1;
 		end
 		else begin
 			enable_add_one_fifo <= 0;
 		end
-		if (counter > 6) begin
+		if (counter > 3) begin
 			enable_add_one <= 1;
 		end
 		else begin
 			enable_add_one <= 0;
 		end
-		if (counter > 8) begin
+		if (counter > 5) begin
 			enable_div_one_fifo <= 1;
 		end
 		else begin
 			enable_div_one_fifo <= 0;
 		end
-		if (counter > 8) begin
+		if (counter > 6) begin
 			enable_div_one <= 1; 
 		end
 		else begin
 			enable_div_one <= 0;
 		end
-		if (counter > 16) begin
+		if (counter > 12) begin
 			enable_add_two_fifo <= 1;
 		end
 		else begin
 			enable_add_two_fifo <= 0;
 		end
-		if (counter > 17) begin
+		if (counter > 13) begin
 			enable_add_two <= 1;
 		end
 		else begin
@@ -200,44 +200,44 @@ always @ (posedge clk or posedge asyn_reset) begin
 		enable_mul_two <= 0;
 	end
 	else begin
-		if (counter > 20) begin
+		if (counter > 16) begin
 			enable_mul_two <= 1;
 		end
 		else begin
 			enable_mul_two <= 0;
 		end
-		if (counter > 31) begin
+		if (counter > 22) begin
 			enable_add_three_fifo <= 1;
 		end
 		else begin
 			enable_add_three_fifo <= 0;
 		end
-		if (counter > 30) begin
+		if (counter > 20) begin
 			enable_add_three <= 1;
 		end
 		else begin
 			enable_add_three <= 0;
 		end
 
-		if (counter > 35) begin
+		if (counter > 25) begin
 			enable_div_two_fifo <= 1;
 		end
 		else begin
 			enable_div_two_fifo <= 0;
 		end
-		if (counter > 36) begin
+		if (counter > 27) begin
 			enable_div_two <= 1;
 		end
 		else begin
 			enable_div_two <= 0;
 		end
-		if (counter > 39) begin
+		if (counter > 29) begin
 			enable_add_four_fifo <= 1;
 		end
 		else begin
 			enable_add_four_fifo <= 0;
 		end
-		if (counter > 40) begin
+		if (counter > 30) begin
 			enable_add_four <= 1;
 		end
 		else begin
@@ -286,7 +286,7 @@ full_fifo_div_two       // FIFO full
 defparam FIFO_div_two.DATA_WIDTH = 2;
 
 Divider_v2 div_two(
-sum_three,
+~sum_three,
 div_two_op_two,
 clk,
 asyn_reset,
@@ -390,9 +390,18 @@ full_fifo_div_three// FIFO full
 );
 defparam FIFO_div_three.DATA_WIDTH = 2;
 
+reg [1:0] sum_five_tmp;
+always @ (*) begin
+	if (sum_five == 2'b11) begin
+		sum_five_tmp = 2'b00;
+	end
+	else begin
+		sum_five_tmp = sum_five;
+	end
+end
 
 Divider_v2 div_three(
-sum_five,
+sum_five_tmp,
 div_three_op_two,
 clk,
 asyn_reset,
@@ -432,43 +441,43 @@ always @ (posedge clk or posedge asyn_reset) begin
 		enable_add_five <= 0;
 	end
 	else begin
-		if (counter > 44) begin
+		if (counter > 34) begin
 			enable_mul_three <= 1;
 		end
 		else begin
 			enable_mul_three <= 0;
 		end
-		if (counter > 55) begin
+		if (counter > 42) begin
 			enable_add_five_fifo <= 1;
 		end
 		else begin
 			enable_add_five_fifo <= 0;
 		end
-		if (counter > 54) begin
+		if (counter > 42) begin
 			enable_add_five <= 1;
 		end
 		else begin
 			enable_add_five <= 0;
 		end
-		if (counter > 57) begin
+		if (counter > 48) begin
 			enable_div_three_fifo <= 1;
 		end
 		else begin
 			enable_div_three_fifo <=0;
 		end
-		if (counter> 57) begin
+		if (counter> 49) begin
 			enable_div_three <= 1;
 		end
 		else begin
 			enable_div_three <= 0;
 		end
-		if (counter > 63) begin
+		if (counter > 50) begin
 			enable_add_six_fifo <= 1;
 		end
 		else begin
 			enable_add_six_fifo <= 0;
 		end
-		if (counter > 64) begin
+		if (counter > 50) begin
 			enable_add_six <= 1;
 		end
 		else begin 
@@ -477,5 +486,174 @@ always @ (posedge clk or posedge asyn_reset) begin
 	end
 end
 
+// iter four
+
+
+wire[1:0] x_four;
+wire [1:0] product_four;
+wire enable_mul_four_fifo;
+
+wire [1:0] add_seven_op_two;
+wire [1:0] sum_seven;
+wire [1:0] div_four_op_two, quotient_four;
+wire [1:0] add_eight_op_one;
+wire [1:0] sum_eight;
+wire empty_fifo_add_seven, full_fifo_add_seven;
+wire empty_fifo_div_four, full_fifo_div_four;
+wire empty_fifo_add_eight, full_fifo_add_eight;
+
+reg enable_add_seven_fifo;
+reg enable_mul_four;
+reg enable_add_seven;
+reg enable_div_four_fifo, enable_div_four;
+reg enable_add_eight_fifo, enable_add_eight;
+
+assign x_four= sum_six;
+
+Multiplier_v2 mul_four(
+x_four,
+x_four,
+clk,
+asyn_reset,
+enable_mul_four,
+product_four
+);
+
+syn_fifo FIFO_add_seven(
+clk      , // Clock input
+asyn_reset , // Active high reset
+enable_mul_one, // Write chip select
+enable_add_seven_fifo, // Read chipe select
+b_value, // Data input
+enable_add_seven_fifo, // Read enable
+enable_mul_one, // Write Enable
+add_seven_op_two, // Data Outpur
+empty_fifo_add_seven, // FIFO empty
+full_fifo_add_seven// FIFO full
+);
+defparam FIFO_add_seven.DATA_WIDTH = 2;
+
+
+Online_adder_hd add_seven(
+product_four,
+~add_seven_op_two,
+clk,
+sum_seven,
+asyn_reset,
+enable_add_seven
+);
+
+
+syn_fifo FIFO_div_four(
+clk      , // Clock input
+asyn_reset , // Active high reset
+enable_mul_four, // Write chip select
+enable_div_four_fifo, // Read chipe select
+x_four, // Data input
+enable_div_four_fifo, // Read enable
+enable_mul_four, // Write Enable
+div_four_op_two, // Data Outpur
+empty_fifo_div_four, // FIFO empty
+full_fifo_div_four// FIFO full
+);
+defparam FIFO_div_four.DATA_WIDTH = 2;
+
+reg [1:0] div_four_op_one;
+
+always @ (*) begin
+	if (~sum_seven == 2'b11) begin
+		div_four_op_one = 2'b00;
+	end
+	else begin
+		div_four_op_one = ~sum_seven;
+	end
+end
+
+
+Divider_v2 div_four(
+div_four_op_one,
+div_four_op_two,
+clk,
+asyn_reset,
+enable_div_four,
+quotient_four
+);
+
+
+always @ (posedge clk or posedge asyn_reset) begin
+	if (asyn_reset) begin
+		enable_mul_four <= 0;
+		enable_add_seven_fifo <= 0;
+		enable_add_seven <= 0;
+	end
+	else begin
+		if (counter > 55) begin
+			enable_mul_four <= 1;
+		end
+		else begin
+			enable_mul_four <= 0;
+		end
+		if (counter > 63) begin
+			enable_add_seven_fifo <= 1;
+		end
+		else begin
+			enable_add_seven_fifo <= 0;
+		end
+		if (counter > 61) begin
+			enable_add_seven <= 1;
+		end
+		else begin
+			enable_add_seven <= 0;
+		end
+		if (counter > 70) begin
+			enable_div_four_fifo <= 1;
+		end
+		else begin
+			enable_div_four_fifo <= 0;
+		end
+		if (counter > 71) begin
+			enable_div_four <=1;
+		end
+		else begin
+			enable_div_four <= 0;
+		end
+		if (counter >70) begin
+			enable_add_eight_fifo <= 1;
+		end
+		else begin
+			enable_add_eight_fifo <= 0;
+		end
+		if (counter > 71) begin
+			enable_add_eight <= 1;
+		end
+		else begin
+			enable_add_eight <= 0;
+		end
+	end	
+end
+
+syn_fifo FIFO_add_eight(
+clk      , // Clock input
+asyn_reset , // Active high reset
+enable_mul_four, // Write chip select
+enable_add_eight_fifo, // Read chipe select
+x_four, // Data input
+enable_add_eight_fifo, // Read enable
+enable_mul_four, // Write Enable
+add_eight_op_one, // Data Outpur
+empty_fifo_add_eight, // FIFO empty
+full_fifo_add_eight// FIFO full
+);
+defparam FIFO_add_eight.DATA_WIDTH = 2;
+
+
+Online_adder_hd add_eight(
+add_eight_op_one,
+~quotient_four,
+clk,
+sum_eight,
+asyn_reset,
+enable_add_eight
+);
 
 endmodule
